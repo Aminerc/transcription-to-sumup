@@ -1,0 +1,5 @@
+python-dotenv
+watchdog
+python-docx
+plyer
+winotify

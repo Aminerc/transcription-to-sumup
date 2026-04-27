@@ -1,0 +1,21 @@
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.pyc
+
+.venv/
+venv/
+env/
+
+.DS_Store
+Thumbs.db
+
+# Meeting artifacts (can be large / personal)
+*.docx
+
+# Common local folders (customize to your paths)
+input/
+output/
+Meetings/
