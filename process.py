@@ -18,8 +18,8 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
 # ==================== CONFIG ====================
-USER_NAME        = os.getenv("USER_NAME", "Amine Ouardi")
-USER_EMAIL       = os.getenv("USER_EMAIL", "aminerc.business@gmail.com")
+USER_NAME        = os.getenv("USER_NAME", "").strip()
+USER_EMAIL       = os.getenv("USER_EMAIL", "").strip()
 OUTPUT_FOLDER    = os.path.normpath(os.getenv("OUTPUT_FOLDER", "."))
 EMAIL_FROM       = os.getenv("EMAIL_FROM", "")
 EMAIL_TO         = os.getenv("EMAIL_TO", "")

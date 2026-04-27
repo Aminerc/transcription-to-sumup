@@ -25,7 +25,7 @@ Automatisation Windows qui **surveille un dossier** de transcriptions de réunio
 ## Installation
 
 ```bash
-git clone <https://github.com/Aminerc/transcription-to-sumup>
+git clone <ton-repo>
 cd meeting-sumup
 python -m venv .venv
 .\.venv\Scripts\activate
