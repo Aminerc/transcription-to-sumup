@@ -262,40 +262,23 @@ def read_transcript(file_path):
             return f.read()
 
 # ==================== PROMPT ====================
+PROMPT_FILE = os.getenv("PROMPT_FILE", "prompt.md").strip() or "prompt.md"
+PROMPT_PATH = PROMPT_FILE if os.path.isabs(PROMPT_FILE) else os.path.join(os.path.dirname(__file__), PROMPT_FILE)
+TRANSCRIPT_MAX_CHARS = int(os.getenv("TRANSCRIPT_MAX_CHARS", "60000"))
+
+def load_prompt_template():
+    if not os.path.isfile(PROMPT_PATH):
+        raise RuntimeError(f"Fichier prompt introuvable : {PROMPT_PATH}")
+    with open(PROMPT_PATH, "r", encoding="utf-8") as f:
+        return f.read()
+
 def build_prompt(transcript):
-    return f"""Tu es un assistant expert en prise de notes de reunions professionnelles.
-L'utilisateur principal s'appelle {USER_NAME}.
-
-Voici la transcription d'un meeting :
-
----
-{transcript[:30000]}
----
-
-Genere une synthese structuree en francais avec exactement ce format :
-
-## TITRE
-[5 mots max resumant le sujet principal du meeting]
-
-## RESUME
-[2-4 phrases resumant le contexte et les sujets abordes]
-
-## DECISIONS PRISES
-- [Decision 1]
-[Si aucune : "Aucune decision formelle identifiee"]
-
-## ACTIONS DE {USER_NAME.upper()}
-- [Action concernant {USER_NAME} specifiquement] - [Deadline si mentionnee]
-[Si aucune : "Aucune action identifiee pour {USER_NAME}"]
-
-## ACTIONS GENERALES
-- [Action] - [Responsable] - [Deadline si mentionnee]
-[Si aucune : "Aucune action formelle identifiee"]
-
-## POINTS CLES
-- [Point important 1]
-- [Point important 2]
-"""
+    template = load_prompt_template()
+    return template.format(
+        user_name=USER_NAME,
+        user_name_upper=USER_NAME.upper(),
+        transcript=transcript[:TRANSCRIPT_MAX_CHARS],
+    )
 
 # ==================== APPEL API ====================
 def call_gemini(prompt):
@@ -320,7 +303,7 @@ def call_claude(prompt):
     url = "https://api.anthropic.com/v1/messages"
     payload = json.dumps({
         "model": CLAUDE_MODEL,
-        "max_tokens": 2048,
+        "max_tokens": 8192,
         "messages": [{"role": "user", "content": prompt}]
     }).encode("utf-8")
     req = urllib.request.Request(url, data=payload, headers={
@@ -362,8 +345,12 @@ def create_docx(summary, meeting_name, date_str, output_path):
         line = line.strip()
         if not line:
             doc.add_paragraph("")
+        elif line.startswith("# "):
+            doc.add_heading(line.replace("# ", ""), level=1)
         elif line.startswith("## "):
             doc.add_heading(line.replace("## ", ""), level=2)
+        elif line.startswith("### "):
+            doc.add_heading(line.replace("### ", ""), level=3)
         elif line.startswith("- "):
             p = doc.add_paragraph(style="List Bullet")
             p.add_run(line[2:])
