@@ -15,6 +15,9 @@ Thumbs.db
 # Meeting artifacts (can be large / personal)
 *.docx
 
+# Local agent instructions (not for public repo)
+CLAUDE.md
+
 # Common local folders (customize to your paths)
 input/
 output/
